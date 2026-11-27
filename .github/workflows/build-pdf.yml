@@ -1,0 +1,39 @@
+name: Build English report
+
+on:
+  push:
+    paths:
+      - report.tex
+      - .github/workflows/build-pdf.yml
+  pull_request:
+    paths:
+      - report.tex
+      - .github/workflows/build-pdf.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install XeLaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends texlive-xetex texlive-latex-extra
+      - name: Compile the PDF
+        run: |
+          mkdir -p build
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=build -jobname='26723810-竺凯' report.tex
+          xelatex -interaction=nonstopmode -halt-on-error -file-line-error -output-directory=build -jobname='26723810-竺凯' report.tex
+      - name: Upload the PDF
+        uses: actions/upload-artifact@v7
+        with:
+          name: research-report-1-english
+          path: build/*.pdf
+          if-no-files-found: error
